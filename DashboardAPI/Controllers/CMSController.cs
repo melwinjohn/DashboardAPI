@@ -88,5 +88,50 @@ namespace DashboardAPI.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("value")]
+        public async Task<ActionResult<string>> GetValueByKeyAndLang([FromQuery] int keyId, [FromQuery] int langId)
+        {
+            try
+            {
+                // Validate input
+                if (keyId <= 0 || langId <= 0)
+                {
+                    return BadRequest("KeyID and LangID must be positive integers");
+                }
+
+                // Check if the key exists
+                var keyExists = await _context.CMSKey.AnyAsync(x => x.ID == keyId);
+                if (!keyExists)
+                {
+                    return NotFound($"KeyID {keyId} does not exist");
+                }
+
+                // Check if the language exists
+                var langExists = await _context.LanguageMaster.AnyAsync(x => x.ID == langId);
+                if (!langExists)
+                {
+                    return NotFound($"LangID {langId} does not exist");
+                }
+
+                // Get the value
+                var value = await _context.CMSKeyValue
+                    .Where(x => x.KeyID == keyId && x.LangID == langId)
+                    .Select(x => x.Value)
+                    .FirstOrDefaultAsync();
+
+                if (value == null)
+                {
+                    return NotFound($"No translation found for KeyID: {keyId} and LangID: {langId}");
+                }
+
+                return Ok(value);
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                return StatusCode(500, "An error occurred while retrieving the value");
+            }
+        }
     }
 }
