@@ -11,7 +11,7 @@ builder.Services.AddDbContext<MultilingualDbContext>(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
-        policy => policy.WithOrigins("http://localhost:5173") // Replace with your frontend's URL
+        policy => policy.WithOrigins("https://effortless-faloodeh-3a6009.netlify.app/") // Replace with your frontend's URL
                         .AllowAnyHeader()
                         .AllowAnyMethod());
 });
